@@ -17,7 +17,7 @@ Windows 桌面便签：文字和图片便签都能钉在桌面上。数据全部
 | --- | --- | --- |
 | `X.Notes-1.1.1-x64-setup.exe` | 1,797,876 B | NSIS 安装包，直接覆盖安装即可升级 |
 | `X.Notes-1.1.1-portable.zip` | 2,239,215 B | 便携版，解压后运行 `x-notes.exe` |
-| `X.Notes-1.1.1-source.zip` | 163,626 B | 源码快照（不含 `release/`、`.gitignore`、`.gitattributes`） |
+| `X.Notes-1.1.1-source.zip` | 约 165 KB | 源码快照（含 `LICENSE`、`.gitignore`、`.gitattributes`，不含 `release/`） |
 
 > 发布页上的文件名空格被 GitHub 替换成了点（`X.Notes-…`）；本地打包时的名称是 `X Notes-…`，两者内容完全相同。
 
@@ -26,8 +26,9 @@ Windows 桌面便签：文字和图片便签都能钉在桌面上。数据全部
 ```text
 94FBEEA115923009124988C05FD48EF7D6F51F020A9DAE2FB085661B5AE7707A  X.Notes-1.1.1-portable.zip
 8117AE8B6ADD409D645A35DA53AA331C31DD4EA22C7DAF260A503B53F318B833  X.Notes-1.1.1-x64-setup.exe
-A7D3C62996A61D9241F05B09DDF173A8D474C9C21CF2D3A044F8239FCCDB4B4F  X.Notes-1.1.1-source.zip
 ```
+
+源码包包含本说明文件，无法在包内写下自身的哈希；其准确校验值见仓库 [`release/VERSION.txt`](https://github.com/scar12138/X_Notes/blob/main/release/VERSION.txt)。
 
 ## 安装与升级
 

@@ -309,9 +309,11 @@ release\X Notes-1.1.1-x64-setup.exe
     NSIS 安装包（发布者 X Notes；与 bundle\nsis\X Notes_1.1.1_x64-setup.exe 一致）
 
 release\X Notes-1.1.1-source.zip
-    163626 字节
-    A7D3C62996A61D9241F05B09DDF173A8D474C9C21CF2D3A044F8239FCCDB4B4F
-    59 个文件（已排除 node_modules / dist / src-tauri\target / src-tauri\gen / release）
+    172518 字节
+    210E22BE647C273D904B5964F19D2C781830ECEB5E9C2584619100204FBF64B9
+    63 个文件（排除 node_modules / dist / src-tauri\target / src-tauri\gen / release）
+    内容与仓库 main 分支一致：tag V1.1.1 的代码 + 之后新增 LICENSE / 发布说明等文档修订；
+    本次重打包同时把包内路径分隔符统一为 /（旧包为 \，在 Linux/macOS 上解压会多出怪文件名）
 
 src-tauri\target\release\x-notes.exe（1.1.1 产物）
     4834304 字节
