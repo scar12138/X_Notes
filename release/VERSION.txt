@@ -9,7 +9,7 @@ X Notes — 版本记录
 技术栈    : Tauri 2 + React 18 + TypeScript + Vite + Rust
 
 Git 仓库  : https://github.com/scar12138/X_Notes
-Git 标签  : V1.1.1（对应首次提交 44f5abb，2026-11-18）
+Git 标签  : V1.1.1（与 main 同一提交；2026-11-18 补齐 LICENSE 与发布说明后统一）
 发布页    : https://github.com/scar12138/X_Notes/releases/tag/V1.1.1
             发布说明见 docs/RELEASE_NOTES_V1.1.1.md；本文件 + 源码压缩包
             继续作为版本基线与 SHA256 记录
