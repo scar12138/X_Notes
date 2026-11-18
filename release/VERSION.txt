@@ -8,8 +8,11 @@ X Notes — 版本记录
 目标平台  : Windows 10 / 11 x64
 技术栈    : Tauri 2 + React 18 + TypeScript + Vite + Rust
 
-Git 标签  : 无（本机未安装 git，仓库也没有 .git 目录，无法打 tag；
-            改用本文件 + 源码压缩包记录版本基线）
+Git 仓库  : https://github.com/scar12138/X_Notes
+Git 标签  : V1.1.1（对应首次提交 44f5abb，2026-11-18）
+发布页    : https://github.com/scar12138/X_Notes/releases/tag/V1.1.1
+            发布说明见 docs/RELEASE_NOTES_V1.1.1.md；本文件 + 源码压缩包
+            继续作为版本基线与 SHA256 记录
 
 
 1.1.1 变更摘要（改名批次，2026-11-17）

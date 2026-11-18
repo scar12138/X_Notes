@@ -2,7 +2,9 @@
 
 X Notes 是一个 Windows 便签工具：Tauri 2 + React + TypeScript + Vite + Rust。所有数据保存在本机，不依赖数据库，不上传云端。
 
-变更记录见 [docs/CHANGELOG.md](docs/CHANGELOG.md)。
+**下载**：[GitHub Releases](https://github.com/scar12138/X_Notes/releases) 提供 x64 安装包（NSIS）和便携版；也可以克隆本仓库自行构建。当前版本 **1.1.1**。
+
+变更记录见 [docs/CHANGELOG.md](docs/CHANGELOG.md)；1.1.1 的发布说明与校验值见 [docs/RELEASE_NOTES_V1.1.1.md](docs/RELEASE_NOTES_V1.1.1.md)。
 
 ## 功能
 
@@ -55,7 +57,7 @@ npm run tauri dev
 npm run tauri build
 ```
 
-产物：
+产物（本机构建，`release/` 下为打包副本，已加入 `.gitignore`，不随仓库分发——下载请用 [Releases](https://github.com/scar12138/X_Notes/releases)）：
 
 - 可执行文件：`src-tauri/target/release/x-notes.exe`
 - 安装包：`src-tauri/target/release/bundle/nsis/X Notes_1.1.1_x64-setup.exe`
@@ -63,6 +65,8 @@ npm run tauri build
 - 安装包副本：`release/X Notes-1.1.1-x64-setup.exe`
 - 版本与校验值：`release/VERSION.txt`
 - 便携运行：把 `x-notes.exe` 与 `WebView2Loader.dll` 放在同一目录后运行
+
+> GitHub Releases 会把文件名中的空格替换为点（例如 `X.Notes-1.1.1-portable.zip`），与本地打包名 `X Notes-1.1.1-portable.zip` 是同一份文件。
 
 `WebView2Loader.dll` 必须与 `x-notes.exe` 同目录；`tauri.conf.json` 已把它作为安装包资源带上。
 
@@ -152,3 +156,9 @@ cargo test --release --features custom-protocol
 - 全局快捷键可能被占用，可在设置中关闭后改用托盘/管理窗口。
 - 关闭管理窗口会隐藏到托盘，真正退出请用托盘菜单“退出”。
 - 同一用户只允许运行一个实例；重复启动会提示从托盘打开已有实例。
+
+## 许可证
+
+[MIT](LICENSE) © 2026 scar12138
+
+你可以自由使用、修改、分发本项目（包括商用），只需保留版权声明与许可声明；软件按「现状」提供，不附带任何担保。

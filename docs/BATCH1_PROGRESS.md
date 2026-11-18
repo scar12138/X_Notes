@@ -27,7 +27,7 @@
 | 11 | `src/components/StylePanel.tsx` | 新增 `flushSeq` 请求序号；只有最新响应写回 `note`，并合并 `pending` 中的本地修改；错误提示同样只在最新请求生效时显示。 |
 | 12 | `src/components/manager/Manager.tsx` | `exitBatch` 上移到主 `useEffect` 之前；`open-settings` 监听里先 `exitBatch()` 再 `setView("settings")`；依赖数组追加 `exitBatch`。 |
 | 13 | `src/components/NoteWindow.tsx` | 页面加载时若 URL 带 `flash=1`，150ms 后播 2 秒高亮（配合第 4/6 项）；卸载时清理定时器。 |
-| 14 | `src-tauri/Cargo.toml` | 修复注释乱码：`缺少这�?feature` → `缺少这个 feature`（以 UTF-8 无 BOM 写回）。 |
+| 14 | `src-tauri/Cargo.toml` | 修复注释乱码：原注释「缺少这个 feature」有一处缺字并带替换符，现以 UTF-8 无 BOM 写回。 |
 | 15 | `src/styles/base.css` | 删除 0 引用变量：`--panel` `--line` `--radius` `--row-bg` `--glass-bg` `--glass-strong` `--glass-weak` `--glass-line` `--glass-edge` `--glass-shadow` `--glass-shadow-soft`；保留 `--glass-blur` / `--glass-blur-soft`。 |
 | 16 | `README.md` | 重写精简版（功能 / 快捷键 / 环境 / 构建 / 数据 / 尺寸模型 / 结构 / 测试 / 限制），产物路径更新到 1.1.0。 |
 | 17 | `docs/CHANGELOG.md` | 新建，收纳原 README 的更新记录、1.0 功能清单、已验证项，新增本批次条目。 |

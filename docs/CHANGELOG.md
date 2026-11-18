@@ -2,6 +2,8 @@
 
 完整的功能说明见 [README](../README.md)；每次交付产物的 SHA256、测试与验收记录见 [`release/VERSION.txt`](../release/VERSION.txt)。
 
+发布页与下载：[Releases · V1.1.1](https://github.com/scar12138/X_Notes/releases/tag/V1.1.1)；可直接贴到 GitHub Release 正文的说明草稿见 [RELEASE_NOTES_V1.1.1.md](RELEASE_NOTES_V1.1.1.md)。
+
 ## 2026-11-17（1.1.1 改名）
 
 - 产品名统一为 **X Notes**（原「桌面便签 / 便签管理」）：窗口标题、主界面品牌、托盘提示与菜单、页面标题全部为 X Notes。
