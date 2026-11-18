@@ -1,0 +1,496 @@
+X Notes — 版本记录
+================================================
+
+版本号    : 1.1.1
+定档日期  : 2026-11-17
+上一版    : 1.1.0（2026-11-17）
+构建命令  : npm run tauri build
+目标平台  : Windows 10 / 11 x64
+技术栈    : Tauri 2 + React 18 + TypeScript + Vite + Rust
+
+Git 标签  : 无（本机未安装 git，仓库也没有 .git 目录，无法打 tag；
+            改用本文件 + 源码压缩包记录版本基线）
+
+
+1.1.1 变更摘要（改名批次，2026-11-17）
+------------------------------------------------
+本版只改名字，图标、便签内容、功能、界面样式全部未动：
+
+ 1) 产品名统一为 X Notes
+    原来窗口标题栏写「便签管理」、主界面左上角写「桌面便签」，
+    tauri.conf.json 的 productName 与安装包名又是 StickyNotes，三处不一致。
+    现在统一成 X Notes：
+      - 窗口标题（tauri.conf.json app.windows[0].title）
+      - 页面标题（index.html <title>）
+      - 主界面左上角品牌（Manager.tsx .brand）
+      - 托盘 tooltip 与托盘菜单（tray.rs）
+      - 单实例提示 MessageBox
+      - 设置页标题由其父窗口标题提供，随窗口标题一起变
+      - 关于页：当前版本还没有做（排在 1.2），本次不新增页面
+    只改文字，未改任何布局、颜色、字号与图标。
+
+ 2) 配置与包名
+    - tauri.conf.json：productName = "X Notes"，version = "1.1.1"
+    - package.json：name = "x-notes"，version = "1.1.1"
+      package-lock.json 顶层与 root 包同步为 x-notes / 1.1.1
+    - Cargo.toml：包名 x-notes，库名 x_notes_lib，version = 1.1.1，
+      description = "X Notes 便签工具"，authors = ["X Notes"]
+    - main.rs 改调 x_notes_lib::run()
+    - 单实例互斥体 Local\XNotes.SingleInstance.v1
+    - 日志前缀 [x-notes]；export.rs 测试临时目录 x-notes-export-test-{}
+    - 可执行文件：x-notes.exe（原 sticky-notes.exe）
+    - 安装包：X Notes_1.1.1_x64-setup.exe（原 StickyNotes_1.1.0_x64-setup.exe）
+    - 便携包：X Notes-1.1.1-portable.zip
+    - 源码包：X Notes-1.1.1-source.zip
+
+ 3) 图标未动
+    src-tauri/icons/ 下所有文件保持原样（32x32.png / 128x128.png /
+    icon.ico 等），任务栏、托盘、安装包、卸载项继续使用原来的黄色便签图标。
+
+ 4) bundle.identifier 特意保留为 com.stickynotes.desktop
+    改它会让 %APPDATA%\com.stickynotes.desktop 数据目录搬家，
+    现有便签、分类、设置和图片都会"消失"（实际是留在旧目录）。
+    本次只改显示名称，数据目录不动，老用户升级后便签原样可见。
+    如果以后要彻底换标识，需要写一次数据迁移，留到后续版本。
+
+ 5) 兼容说明
+    - 安装版：直接覆盖安装 X Notes_1.1.1_x64-setup.exe 即可，
+      数据目录不变，便签不受影响。
+    - 便携版：解压 X Notes-1.1.1-portable.zip 到新目录运行 x-notes.exe；
+      旧的 sticky-notes.exe 可删除。数据同样在 %APPDATA% 里，不会丢。
+    - 旧名残留只出现在历史文档（1.0.0 / 1.1.0 记录）与旧便携目录中，
+      属于记录，不回改。
+
+
+1.1.0 变更摘要
+------------------------------------------------
+本版只改界面观感与布局组织，功能一个都没有减少：
+
+00) 改名 X Notes + 按钮/开关/危险色全面统一（本版最后一批改动，2026-11-17 下午）
+   - 改名：原来窗口标题栏写「便签管理」、主界面左上角写「桌面便签」，两个名字
+     不一致。现在统一成 X Notes：tauri.conf.json 的窗口 title、index.html 的
+     <title>、Manager.tsx 的 .brand 文本、托盘 tooltip、单实例提示 MessageBox、
+     Cargo.toml 的 description、README 标题与描述全部同步；只改文字，
+     黄色便签图标与布局未动。
+   - 公共按钮体系：新增 .btn-primary（button.primary 同时命中）——白底 #FFFFFF、
+     高 32px、左右内边距 12px、圆角 999px、字号 14px、文字 #222222、
+     阴影 0 2px 6px rgba(0,0,0,0.06)；:hover 只把阴影微调到
+     0 2px 8px rgba(0,0,0,0.10)，底色不跳变。次要按钮（.mini、行内工具、
+     设置页底部、样式面板底部、弹窗、返回、横幅）统一成同一套高 32px /
+     圆角 999px / 白底 / 淡阴影，只有字号小一号（13px）。manager.css 与
+     style-panel.css 里重复的按钮基类、hover、button.primary、button.danger
+     全部删掉，只在 base.css 保留一份。
+   - 「＋ 新建」与分类「新建」同一个类：NotesView.tsx 用 btn-primary
+     new-button，CategorySection.tsx 与 SettingsView.tsx 用 btn-primary，
+     实测计算样式完全一致（32px / 999px / 14px / 白底 / 同一阴影）。
+   - 设置页开关统一：ui.tsx 的 Toggle 结构改成状态文字在左、开关在右，
+     文字固定「已开启 / 已关闭」（12px、#8E8E93），每一行都有；开关本体统一
+     44×24、圆角 999px、关态 #E5E5EA、开态 #007AFF，圆点 20px、位移 20px。
+     .settings-view .field 去掉 flex-wrap 并固定行高 48px，标签 flex:1 1 auto
+     单行省略、控件 margin-left:auto 右对齐，320px 下开关不错位；
+     .field:has(.toggle) 让设置页与样式面板共用同一套行高，
+     数据文件夹那种长路径行仍允许换行。原来「显示最后修改时间」
+     「新文字便签默认显示边框」没有状态文字，现在自动补上。
+   - 菜单第二项改名：「添加图片便签」→「新建图片便签」（NotesView.tsx 下拉菜单、
+     托盘菜单、README 同步），第一项仍是「新建文字便签」。
+   - 行内按钮缩小：便签列表每行的「定位 / 删除 / …」改成 .row-tools > button
+     单独一套——高 28px、左右内边距 8px、圆角 999px、字号 12px、字重 400、
+     0 1px 3px rgba(0,0,0,.05) 阴影；「…」固定 28×28。实测三个按钮合计只占
+     行宽 42%（定位 42×28、删除 42×28、… 28×28）。用直接子选择器是为了
+     不污染「…」弹出的 .row-menu button。
+   - 删除类红色统一成一个：--danger 定为 #D92D20，新增 --danger-hover #B42318；
+     文字、边框、图标都取这一个变量，悬停统一加深到 #B42318。危险按钮规则
+     同时设 color 与 border-color rgba(217,45,32,.45)，不再各写各的红。
+     涉及：便签列表每行「删除」、样式面板「删除」、确认弹窗
+     「移入回收站 / 彻底删除」、批量管理栏「删除」、回收站
+     「彻底删除 / 一键清空」、设置页分类管理「删除」、便签错误提示 .note-error
+     底色。原来的亮红 #FF3B30 与深红 #D64545 全部删除；设置页分类删除按钮
+     补上 danger-ghost（之前只有 mini，所以不红）。全仓复扫确认源码里已无
+     #FF3B30 / #FF0000 / #E53935 / #B91C1C / #DC2626 / #D64545；
+     剩下的 #E74C3C 是通用色板 COLOR_SWATCHES 的一员（不是删除色），
+     models.rs 里的 #FF0000 是淡色映射单测输入，均保留。
+     构建产物里 #d92d20 出现 3 处、#b42318 1 处、#ff3b30 与 #d64545 均为 0。
+
+0) 图片便签缩放修复 + 顶部栏/新建按钮配色（2026-11-17 下午）
+   - 缩到最小被压扁、左右两边被裁：原来实时缩放先把宽高分别夹到 80/60，
+     再用当前窗口比例反算高，最后又各夹一次 40；触发一次就把宽高比改坏，
+     而 .image-clip img 又是 object-fit: cover，于是左右被裁。现在：
+       · 宽高只能一起变，比例取原图像素比例（读图时用 new Image() 记下
+         naturalWidth / naturalHeight 存进 imageSizeRef）；
+       · 最小尺寸按比例折算成一个最小宽度 max(80, 60×比例)，
+         宽到最小就停、高跟着停；
+       · 图片改 object-fit: contain，整张图完整显示，不裁切、不拉伸；
+       · 后端同源夹取一并改按比例：Note::sanitize() 在「图片便签 + 锁定比例」
+         时只按 width 折算 height；commands::resize_note 收到尺寸后按图片
+         真实比例把高度反算一次；images::fit_size() 的最小兜底从分别
+         max(60)/max(40) 改成按比例放大。
+   - 拖右下角缩放后右下角多一截：窗口尺寸带小数时会被取整，多出的 1–2px
+     原来全堆右下。现在 .note-root 改成 display:flex 居中容器，
+     .image-frame / .note-card 加 flex:none，多出的部分四边均分。
+   - 顶部栏改白：.mgr-header 由 var(--fill) 改为 var(--card)（#FFFFFF），
+     与便签卡片同为纯白，只用原有的 1px var(--card-line)（#E5E5EA）分隔。
+   - 「＋ 新建」阴影：button.primary 从 0 2px 8px rgba(0,0,0,.08) 换成
+     0 2px 6px rgba(0,0,0,0.06)；:hover 不再把底色跳成浅灰，
+     改成保持白色、阴影微调到 0 3px 8px rgba(0,0,0,0.09)。
+
+1) 卡片分层改成 iOS 设置页那套，主窗口实色浅灰底
+   - 主窗口底色 --bg = #F2F2F7（实色不透明，不用窗口透明换毛玻璃）。
+   - 每张便签卡片纯白 --card = #FFFFFF，圆角 12px，1px 浅灰边
+     --card-line = #E5E5EA，淡阴影 --card-shadow = 0 2px 8px rgba(0,0,0,.08)，
+     卡片之间 12px 间隙，不再贴着。
+   - 选中态不用黑框：.note-row.checked 改为淡蓝边 --accent = #007AFF +
+     淡蓝底 --accent-bg = #EAF4FF + 淡蓝投影；复选框 accent-color 仍是深灰，
+     打勾样子不变。
+   - 搜索框、筛选药丸、顶部标签栏、⋯按钮底色比卡片再透一点：
+     --fill = rgba(118,118,128,.08)，hover 用 --fill-hover = rgba(118,118,128,.14)。
+     选中药丸（.cat-chip.on / .tab-pill / .more-button.on）为纯白 + 0 1px 3px 阴影，
+     未选中为浅灰半透明。
+   - 设置页 .section、样式面板 .layer-choice / .chip 同为纯白卡片；
+     .layer-choice.on 也用淡蓝边 + 淡蓝底；开关 .toggle.on .toggle-dot 用 --accent，
+     色板选中描边 .swatch.active 也改 --accent。
+   - 弹窗 .modal 保持白色卡片（圆角回到 14px），width:280px / max-width:80vw 未改。
+   - 便签本体（note.css）不受影响：拖动条 --glass-blur（saturate 180%）、
+     时间条 --glass-blur-soft（saturate 160%）仍是原液态玻璃，两档差异保留。
+
+2) 顶部归纳成三行
+   - 第一行：标题 + 便签列表 / 回收站 / 设置。
+   - 第二行：搜索框 + 「＋ 新建」下拉（新建文字便签 / 添加图片便签）。
+   - 第三行：一整排筛选药丸（见第 3 条），
+     右侧「⋯」小按钮收着全部显示 / 全部隐藏 / 批量管理。
+   - 删除旧的 .toolbar / .quick-row / .type-row / .cat-row 四个容器。
+
+3) 筛选行合成一整排（本版最后一项改动）
+   - 取消类型筛选和分类筛选分两段的做法，只剩一排，顺序固定：
+     全部 / 文字便签 / 图片便签 / 未分类 / 各自建分类……
+   - 「文字便签」「图片便签」当作系统默认的两个分类，写死最前面，
+     不能改名、不能删除。
+   - 删掉「全部分类」药丸 —— 全部就是全部。
+   - 一整排共用同一个选中项：新增 src/lib/noteFilter.ts 的 NoteFilter
+     联合类型（{kind:"all"} / {kind:"type",value:"text"|"image"} /
+     {kind:"category",value:""|分类id}），不再有类型和分类两个独立状态。
+   - 过滤规则：全部不过滤；文字/图片便签按 note.type；未分类按
+     category === ""；自建分类按 category === 该 id（文字和图片都算）。
+   - 这一排是单行横向滚动（overflow-x:auto + 隐藏滚动条），
+     分类再多也不换行、不把列表往下顶。删掉不再使用的 .chip-divider。
+   - 分类被删除时筛选自动回到「全部」（filterStillValid()）。
+   - 回收站共用同一排筛选、同一个 applyFilter()；筛选时标题显示
+     「N 张（共 M 张）」。
+
+4) 回收站支持筛选
+   - 顶部同款一整排药丸；「一键清空」改成椭圆药丸（999px 圆角），
+     危险态只用红色文字 + 红边 + 淡红底。
+
+5) 页签滑动药丸
+   - TabPill 量取标签 offsetLeft / offsetWidth，transform + width 走
+     240ms cubic-bezier(.32,.72,0,1)，不是瞬间跳变。
+   - 药丸是纯白卡片 + 0 1px 3px 阴影；未选中标签更透。
+
+6) 便签背景淡色板改成色相分明（本版最后一批改动）
+   - 旧 6 色 #F2EEDE / #DDEEE6 / #DEEAF2 / #F3E2E6 / #E8EAED / #ECE4F1 偏灰，
+     黄绿蓝粉紫选哪个都差不多；现在换成
+     淡黄 #FFF1A8 / 淡绿 #B7E4C7 / 淡蓝 #A8D8FF /
+     淡粉 #FFC8DD / 淡紫 #D8B4FE / 淡橙 #FFD6A5
+     （明度 82~90%、视觉饱和度约 50%，比原来高约 20 个点），
+     默认背景色 #FFF1A8，文字色仍 #222222。
+   - ui.tsx 的 PASTEL_SWATCHES 与 models.rs 的 PASTEL_BACKGROUNDS 保持同一套值。
+   - pastel_background() 改为：色板内原样返回；无彩色（饱和度 < 15）原样返回；
+     其余按色相找最近的新淡色，色相接近时再用 RGB 距离消歧
+     （避免纯蓝被吸到淡紫）。旧数据实测 #F2EEDE → #FFF1A8、
+     #DDEEE6 → #B7E4C7、#FFF7B2 → #FFF1A8、#FF0000 → #FFC8DD、
+     #0000FF → #A8D8FF；#E8EAED 这类中性灰保持原样。
+   - 单测 pastel_background_maps_old_saturated_colors 同步更新，
+     新增旧淡色映射断言。
+
+7) 右键菜单两处说明文字精简（本版最后一批改动）
+   - 窗口层级 → 桌面：原来括号里除了「被窗口盖住」还跟着一句 Win+D 的说明，
+     现在只保留「桌面（被窗口盖住）」，置顶与普通两项未动；
+     样式面板里桌面那一项的副标题也同步去掉后半句。
+     全仓界面文案已无这句说明。
+   - 鼠标穿透：原「鼠标穿透（只看不挡点击）」改为「鼠标穿透」，功能不变；
+     样式面板该项说明从「只看不挡点击；可从管理窗口或托盘关闭」
+     改为「可从管理窗口或托盘关闭」。
+
+
+1.1.0 维护批次（2026-11-17 晚，功能与缺陷修复）
+------------------------------------------------
+本批次只修缺陷与做清理，界面布局、颜色、尺寸未改：
+
+ 1) 全部隐藏后无法全部显示
+    Ctrl+Alt+H 判断“是否有可见便签”时把回收站也算进来了（回收站里的便签
+    visible 仍为 true），导致全部隐藏后再按一次永远走“隐藏”分支。
+    现在只统计未删除的便签。
+
+ 2) 定位隐藏便签时不闪、不聚焦
+    旧逻辑先建窗再立刻 emit_to("flash")，事件发在窗口创建之前被丢弃。
+    现在定位时若窗口不存在，改为带 flash=1 建窗，由新窗口在页面加载完成后
+    自己播 2 秒高亮，并在 show 之后聚焦；窗口已存在时仍走 emit_to。
+
+ 3) update_note 可绕过业务逻辑
+    merge_patch 由黑名单（只挡 id / createdAt）改为白名单：只允许
+    content / x / y / width / height / layer / backgroundColor / textColor /
+    fontFamily / fontSize / bold / italic / textAlign / opacity /
+    cornerRadius / shadow / border / frame / locked / clickThrough /
+    lockAspect / category。deletedAt、visible、updatedAt、type、imageFile
+    等只能走各自的命令，不再能绕过回收站与窗口销毁逻辑。
+
+ 4) 列表行“…”菜单关不掉
+    全局 mousedown 关闭菜单时先关、按钮 onClick 又开，表现为点不动。
+    现在 mousedown 排除“…”按钮本身，交给 onClick 做开关。
+
+ 5) 样式面板滑块偶发回跳
+    90ms 防抖下可能有两次请求在途，旧响应晚到会覆盖新值。改为给每次请求
+    编号，只有最新一次响应的结果写回界面，未发出的本地修改继续合并。
+
+ 6) 托盘进设置残留批量状态
+    open-settings 事件先退出批量并清空选中，再切到设置页。
+
+ 7) 管理窗口尺寸上限不一致
+    保存时上限写的是 4000，读取时 sanitize 钳到 2000，两者统一为 2000。
+
+ 8) “应用阴影到全部”计数偏大、列表重排
+    改为只统计并广播未删除的便签，纯样式操作不再修改 updatedAt，
+    列表按更新时间排序不会因为换阴影而跳动。
+
+ 9) 清理
+    - 删除 0 引用的 CSS 变量：--panel / --line / --radius / --row-bg /
+      --glass-bg / --glass-strong / --glass-weak / --glass-line /
+      --glass-edge / --glass-shadow / --glass-shadow-soft。
+    - 删除从未读写的 Note.monitor 与未使用的 Settings.data_version
+      （旧 JSON 里的多余字段由 serde 忽略，notes.json 的 dataVersion: 2 保留）。
+    - 修复 Cargo.toml 注释里的乱码字符。
+    - README 精简为使用 / 构建 / 数据 / 结构 / 测试 / 限制，详细更新记录
+      移到 docs/CHANGELOG.md，并把产物路径更新到 1.1.0。
+
+
+1.1.0 维护批次 · 第二批（2026-11-17 晚，性能与体验）
+------------------------------------------------
+ 1) 列表缩略图（read_thumbnail）
+    新增 read_thumbnail 命令：Rust 侧把图片缩到最长边 144px、编码成 PNG
+    data URL 再回传，并按“文件名 + 文件修改时间”缓存（超过 512 条清空）。
+    管理列表的 .thumb 不再每次把整张原图 base64 到前端；便签本体仍用原图。
+    解码前先克隆 images_dir、不持存储锁；文件名沿用 safe_image_path 校验。
+    新增单测 thumbnail_shrinks_and_is_cached / thumbnail_rejects_path_escape。
+
+ 2) 管理窗口隐藏时跳过刷新、显示时补一次
+    管理窗口不可见时，notes-changed 只置标记不刷新列表；
+    visibilitychange 回到 visible 时补拉一次并清标记。
+    分类 / 设置广播保持原样（低频轻量）。
+
+ 3) 设置页改即时保存
+    去掉底部“保存设置”按钮与未保存提示。开关 / 下拉立即写盘，
+    数字框与颜色面板 300ms 防抖合并；同一时刻只允许一个请求在途，
+    保存期间的新改动会在完成后自动补写。页脚显示
+    “修改后立即保存 / 正在保存… / 已保存 HH:MM:SS / 保存失败：原因”；
+    失败时界面回退为服务端值并标红。切走设置页会补写仍在防抖窗口内的改动；
+    导入数据包等外部改动只在本地无待保存内容时同步进界面。
+
+ 4) 管理窗口记位置
+    Settings 新增 managerX / managerY（Option，None = 从未记录）。
+    关闭窗口与退出时记录 inner_size 与 outer_position（按缩放折算逻辑像素），
+    启动时恢复尺寸后恢复位置；位置必须与某块显示器重叠才恢复，
+    否则保持 tauri.conf.json 的居中。sanitize 会丢弃非有限坐标。
+    新增单测 manager_position_defaults_to_none_and_drops_invalid。
+
+
+交付产物与校验值（SHA256，1.1.1 改名批次）
+------------------------------------------------
+release\X Notes-1.1.1-portable.zip
+    2239215 字节
+    94FBEEA115923009124988C05FD48EF7D6F51F020A9DAE2FB085661B5AE7707A
+    内含 README.md（9006B）/ x-notes.exe（4834304B）/ WebView2Loader.dll（160880B）
+    解压后直接运行 x-notes.exe 即可，数据仍在 %APPDATA%\com.stickynotes.desktop
+
+release\X Notes-1.1.1-x64-setup.exe
+    1797876 字节
+    8117AE8B6ADD409D645A35DA53AA331C31DD4EA22C7DAF260A503B53F318B833
+    NSIS 安装包（发布者 X Notes；与 bundle\nsis\X Notes_1.1.1_x64-setup.exe 一致）
+
+release\X Notes-1.1.1-source.zip
+    163626 字节
+    A7D3C62996A61D9241F05B09DDF173A8D474C9C21CF2D3A044F8239FCCDB4B4F
+    59 个文件（已排除 node_modules / dist / src-tauri\target / src-tauri\gen / release）
+
+src-tauri\target\release\x-notes.exe（1.1.1 产物）
+    4834304 字节
+    58C4F4EF9B7B92FD9A31970B8C881E0EB012C8F4279D7BE84F28C8D2ED881B37
+    文件属性：FileDescription / ProductName / CompanyName 均为 X Notes，版本 1.1.1
+
+src-tauri\target\release\WebView2Loader.dll
+    160880 字节
+    86545B66CDB0603BC26B626FB9AD610CB6E71F28D468F5EA66DF23B03DDA96D5
+    （与 1.1.0 一致，未改）
+
+README.md
+    9006 字节
+    0D5E4C4AF235FC9F4142C79D69AF7E277058B7655DD9A2006DD40AAE70922E72
+
+图标：src-tauri/icons/ 未改动，安装包 / 任务栏 / 托盘继续使用原黄色便签图标。
+
+说明：release\StickyNotes-1.1.0-portable\ 是 1.1.0 的旧便携目录，
+其中 sticky-notes.exe 仍被运行中的旧实例占用，本次未覆盖；
+1.1.1 请使用新的 X Notes-1.1.1-portable.zip，旧目录可在退出旧实例后删除。
+
+
+交付产物与校验值（SHA256，1.1.0 历史）
+------------------------------------------------
+release\StickyNotes-1.1.0-portable.zip
+    2237891 字节
+    AF3A132CE3AF67812E86B97A564A71BC92773E687C6239C7F410DF18FF8DAA60
+    内含 README.md（8896B）/ sticky-notes.exe（4834816B）/ WebView2Loader.dll（160880B）
+    （1.1.0 第二批重新打包；解压后的 exe 与 target\release 完全一致）
+
+release\StickyNotes-1.1.0-x64-setup.exe
+    1799152 字节
+    657E759525B560BF6144DEF43636C34D654CE34918D6C96202FA44CC20B73B98
+    NSIS 安装包
+
+release\StickyNotes-1.1.0-source.zip
+    163121 字节
+    F03DF94EBE428775EEFAD84CD84E49709CE29139EC3691C03498518EE28FAE74
+    59 个文件（已排除 node_modules / dist / src-tauri\target / src-tauri\gen / release）
+
+src-tauri\target\release\sticky-notes.exe（第二批产物）
+    4834816 字节
+    FB2AF2968ED6311941AC5D7D43F0FAF2150030AD86A7B72FDBEA398421029A71
+
+release\StickyNotes-1.1.0-portable\README.md
+    8896 字节
+    C97A19B88B7D1299ED895A06A2DC2D3B3BA834ABF17BCB3674AF2F914BE479B3
+
+release\StickyNotes-1.1.0-portable\WebView2Loader.dll
+    160880 字节
+    86545B66CDB0603BC26B626FB9AD610CB6E71F28D468F5EA66DF23B03DDA96D5
+
+注意：第二批打包时 release\StickyNotes-1.1.0-portable\ 目录里的
+sticky-notes.exe 仍被正在运行的实例占用，未能覆盖（README.md 已更新）；
+portable.zip 是从临时目录用新产物重新压缩的，zip 内容正确，
+退出正在运行的实例后把 zip 解压到该目录即可同步。
+
+
+构建与检查记录（1.1.1 改名批次，2026-11-17）
+------------------------------------------------
+npx tsc --noEmit                                                          EXIT 0
+cargo test --release --features custom-protocol --manifest-path src-tauri\Cargo.toml
+                                                                          16 passed / 0 failed
+npm run tauri build                                                       EXIT 0
+
+产物核对（静态）：
+- target\release\x-notes.exe 属性：FileDescription / ProductName / CompanyName = X Notes，
+  FileVersion / ProductVersion = 1.1.1
+- bundle\nsis\X Notes_1.1.1_x64-setup.exe 生成成功，publisher = X Notes
+- tauri.conf.json：productName = X Notes、window title = X Notes、version = 1.1.1
+- index.html <title> = X Notes；Manager.tsx .brand = X Notes；tray.rs tooltip = X Notes
+- src-tauri/icons/ 内文件未改动（比对 1.1.0 打包快照，mtime 未变）
+
+（cargo 唯一告警为 "corrupt .drectve at end of def file"，来自 TDM-GCC 工具链的
+  已知无害告警，非代码警告。cargo clippy 在本机未安装。）
+
+
+构建与检查记录（1.1.0 维护批次 · 第二批，2026-11-17 晚，第二批完成后重新验证）
+------------------------------------------------
+npx tsc --noEmit                                                          EXIT 0
+cargo test --release --features custom-protocol --manifest-path src-tauri\Cargo.toml
+                                                                         16 passed / 0 failed
+npm run tauri build                                                       EXIT 0
+
+（cargo 唯一告警为 "corrupt .drectve at end of def file"，来自 TDM-GCC 工具链的
+  已知无害告警，非代码警告。cargo clippy 在本机未安装。）
+
+
+运行时验收（WebView2 远程调试注入实测）
+------------------------------------------------
+1.0.0 已验证项（本版回归仍全部通过）：
+主界面结构、删除弹窗 280px、定位高亮只亮一张、批量管理、回收站恢复与彻底删除、
+分类管理与筛选、样式面板、锁定纯展示、Esc/失焦退出编辑立即刷新、
+文字/图片类型筛选、便签淡色背景、右键菜单文案、背景色板。
+
+1.1.0 新增验证：
+- 顶部结构       .search-row 子元素 = ["search-input", "new-wrap"]；
+                 .filter-row 共 1 个；.toolbar / .quick-row / .cat-row / .type-row 均为 0
+- 卡片分层       body 与 .manager 均 rgb(242,242,247)；
+                 .note-row rgb(255,255,255) + 1px rgb(229,229,234) + border-radius 12px
+                 + box-shadow rgba(0,0,0,0.08) 0 2px 8px + backdropFilter none；
+                 .note-list gap 12px
+- 顶栏/输入      .mgr-header / .search-input / .tabs 均 rgba(118,118,128,0.08)，
+                 backdropFilter none；.tab-pill rgb(255,255,255)
+- 药丸           .cat-chip 未选 rgba(118,118,128,0.08) + rgb(76,81,97) + 无阴影；
+                 .cat-chip.on rgb(255,255,255) + rgb(38,43,54) + 0 1px 3px rgba(0,0,0,0.12)
+- 选中卡片       批量勾选后 .note-row.checked：bg rgb(234,244,255)、
+                 border rgb(0,122,255)、shadow rgba(0,122,255,0.18) 0 2px 8px、radius 12px；
+                 .row-check accentColor rgb(38,43,54) 未变
+- 页签药丸       位置 133 → 203 → 261（便签列表 / 回收站 / 设置），
+                 transition 为 0.24s cubic-bezier(0.32,0.72,0,1)
+- 回收站         删一张图片进回收站后各筛选下的张数正确；
+                 一键清空按钮 border-radius 999px、红色文字 rgb(217,45,32)、
+                 红色边框 rgba(217,45,32,0.45)
+- 弹窗           .modal 白色卡片 rgb(255,255,255) + rgb(229,229,234) 边 + 圆角 14px，
+                 320px 视口下宽 256px（受 max-width:80vw 限制，规则未改）
+
+- 顶部栏/新建    .mgr-header 计算样式 rgb(255,255,255)，
+                 下边线 rgb(229,229,234) 1px；
+                 .new-button rgb(255,255,255) 底 + rgba(0,0,0,0.06) 0 2px 6px
+                 + border-radius 999px
+- 图片等比缩放   模拟拖动缩放采样 8 个尺寸（-50 ~ -750 px），
+                 宽高比始终 1.3308 ~ 1.3333（原图 1440×1080 = 1.3333）；
+                 缩到最小停在 80×60、比例仍是 1.3333；object-fit 实测 contain；
+                 缩到 80×60 截图确认整张图完整可见、左右未裁
+- 四边留白       相框 10px 时 left/top/right/bottom 留白均为 10px；
+                 相框 10.5px（带取整误差）时 10.5 / 10.63 / 10.5 / 10.63，
+                 四边一致；图片在便签内居中
+
+- 筛选行合并     只有 1 个 .filter-row；芯片顺序 = [全部, 文字便签, 图片便签, 未分类]，
+                 建两个自建分类后变为 [..., 工作, 生活]；.chip-divider 数量 0；
+                 .filter-chips 计算样式 overflow-x: auto、flex-wrap: nowrap
+- 筛选行为       文字便签 3 行（无缩略图）、图片便签 1 行（有缩略图）、
+                 未分类 4 行、全部 4 行；自建分类「工作」1 行、「生活」0 行、
+                 未分类（把图片分到工作后）3 行
+- 回收站筛选     一张图片便签（属「工作」）在回收站时：
+                 全部 1 张、图片便签 1 张、文字便签「0 张（共 1 张）」、
+                 工作 1 张、未分类「0 张（共 1 张）」
+
+- 改名 X Notes    document.title、主界面左上角 .brand 文本、Windows 原生窗口
+                  标题三处实测都是「X Notes」
+- 按钮统一       .new-button 与分类「新建」实测同为 32px 高 / 999px 圆角 /
+                  14px 字号 / 白底 / rgba(0,0,0,0.06) 0 2px 6px；
+                  批量栏「全选/反选/完成/显示/隐藏/锁定/解锁/删除」与
+                  .batch-cat-select 全部 32px 高、999px 圆角
+- 行内按钮       320px 视口下「定位 42×28」「删除 42×28」「… 28×28」，
+                  合计占行宽 42%，圆角 999px、字号 12px、字重 400；
+                  「…」弹出的菜单项仍是 122×28 的列表样式，未被压扁
+- 设置页开关     320px 视口下四行开关行高都是 48px、开关 44×24、
+                  右侧对齐（rightGap = 0）、状态文字「已开启 / 已关闭」
+                  在开关左侧；点击后文字与底色同步切换
+                  （rgb(229,229,234) ↔ rgb(0,122,255)）；
+                  「数据文件夹」长路径行仍允许换行（行高 66px）
+- 删除类红色     列表行「删除」、回收站「一键清空」、确认弹窗「移入回收站」、
+                  样式面板「删除」、批量栏「删除」、设置页分类「删除」
+                  六处计算样式全部 rgb(217,45,32) + 边框 rgba(217,45,32,0.45)；
+                  构建产物 CSS 里 #d92d20 3 处、#b42318 1 处，
+                  #ff3b30 与 #d64545 均为 0
+
+- 右键菜单文案   menu.rs 里「窗口层级 → 桌面」为「桌面（被窗口盖住）」、
+                 「鼠标穿透」无括号说明；样式面板三个层级项实测为
+                 「置顶 始终在其他窗口前面」「桌面 贴在桌面，被窗口盖住」
+                 「普通 和普通窗口一起层叠」，「鼠标穿透」的说明为
+                 「可从管理窗口或托盘关闭」；全仓界面文案已无这句说明
+- 背景色板       样式面板「背景颜色」6 个色点实测
+                 rgb(255,241,168) / rgb(183,228,199) / rgb(168,216,255) /
+                 rgb(255,200,221) / rgb(216,180,254) / rgb(255,214,165)，
+                 「文字颜色」仍是 10 色通用板；旧数据里的 #F2EEDE 便签
+                 渲染成 rgb(255,241,168)、文字 rgb(34,34,34)；
+                 #DDEEE6 映射成 #B7E4C7
+
+
+环境注意事项
+------------------------------------------------
+1) 若把本程序放在 D:\Desktop\DSH_Test 这条路径下运行，exe 会因目录继承了
+   Low 完整性标签而在启动时崩溃（0xc0000409，WebView2 报 0x800700AA
+   "请求的资源在使用中"）。这是目录 ACL 问题，与程序本身无关。修复方式：
+
+     icacls <目录> /grant "<用户名>:(OI)(CI)F" /T /C
+     icacls <目录> /setintegritylevel Medium /T /C
+
+   单独执行 /setintegritylevel 会报 Access is denied，必须先 grant。
+   重新构建产物后建议再执行一次。
+2) debug 模式跑 Rust lib 测试会因缺少运行期入口点崩溃（0xc0000139），
+   请统一使用 --release。

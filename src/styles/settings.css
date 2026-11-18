@@ -1,0 +1,353 @@
+/* ---------------- 设置 ---------------- */
+
+.settings-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  padding: 16px 20px 0;
+}
+
+.settings-scroll {
+  flex: 1;
+  overflow: auto;
+  padding-bottom: 20px;
+  max-width: 760px;
+}
+
+/* 设置页每个分区都是一张纯白卡片，浮在浅灰底上 */
+.section {
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  box-shadow: var(--card-shadow);
+  border-radius: 12px;
+  padding: 16px 18px;
+  margin-bottom: 14px;
+}
+
+.section-head h3 {
+  margin: 0;
+  font-size: 14px;
+}
+
+.section-head p {
+  margin: 4px 0 12px;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--card-line);
+  flex-wrap: wrap;
+}
+
+/* 设置页每行统一高 48px、不换行：窗口拉到 320px 时控件仍在右侧同一列 */
+.settings-view .field {
+  flex-wrap: nowrap;
+  min-height: 48px;
+  box-sizing: border-box;
+  gap: 12px;
+}
+
+.settings-view .field-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 数据文件夹那一行放的是长路径，允许换行并把路径截断 */
+.settings-view .field:has(.path-text) {
+  flex-wrap: wrap;
+  height: auto;
+  padding: 8px 0;
+}
+
+.settings-view .path-text {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.settings-view .field-control {
+  flex: 0 0 auto;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+/* 开关行（设置页与样式面板共用）：左边功能名 + 一行小字说明，右边固定「状态文字 + 开关」，
+   整行不换行、高度固定 48px，窗口拉到 320px 开关也不会错位 */
+.field:has(.toggle) {
+  flex-wrap: nowrap;
+  height: 48px;
+  min-height: 48px;
+  box-sizing: border-box;
+  padding: 0;
+  gap: 12px;
+}
+
+.field:has(.toggle) .field-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+  font-size: 13px;
+  color: #222222;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.field:has(.toggle) .field-label em {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.field:has(.toggle) .field-control {
+  flex: 0 0 auto;
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.field:last-child {
+  border-bottom: none;
+}
+
+.field-label {
+  font-size: 12.5px;
+  color: #3a3f4d;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.field-label em {
+  font-style: normal;
+  font-size: 10.5px;
+  color: var(--muted);
+}
+
+.field-control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field select,
+.field input[type="number"],
+.field input[type="text"] {
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-family: inherit;
+  background: var(--fill);
+  color: var(--text);
+  min-width: 120px;
+}
+
+.field input[type="number"] {
+  width: 88px;
+  min-width: 0;
+}
+
+.slider-field {
+  display: block;
+  border-bottom: none;
+  padding: 6px 0;
+}
+
+.slider-field .field-label {
+  justify-content: space-between;
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.slider-field input[type="range"] {
+  width: 100%;
+  accent-color: var(--ink);
+}
+
+.color-field {
+  display: block;
+  border-bottom: none;
+  padding: 8px 0;
+}
+
+.color-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.color-row input[type="color"] {
+  width: 38px;
+  height: 30px;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  background: var(--card);
+  padding: 2px;
+  cursor: pointer;
+}
+
+.color-row .color-text {
+  width: 110px;
+  text-transform: uppercase;
+}
+
+.swatches {
+  display: flex;
+  gap: 5px;
+}
+
+.swatch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  cursor: pointer;
+  padding: 0;
+}
+
+.swatch.active {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* 开关：统一 44×24 药丸，状态文字在左边 */
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--hint);
+  font-family: inherit;
+}
+
+.toggle-label {
+  font-size: 12px;
+  line-height: 1;
+  color: #8e8e93;
+  white-space: nowrap;
+}
+
+.toggle-dot {
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: #e5e5ea;
+  border: none;
+  position: relative;
+  transition: background 0.15s;
+  flex: none;
+}
+
+.toggle-dot::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ffffff;
+  top: 2px;
+  left: 2px;
+  transition: transform 0.15s;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.22);
+}
+
+.toggle.on .toggle-dot {
+  background: #007aff;
+}
+
+.toggle.on .toggle-dot::after {
+  transform: translateX(20px);
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.row-actions button.on {
+  background: var(--card);
+  color: var(--ink);
+  border-color: var(--card-line);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.mono {
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 11px;
+  color: var(--ink-soft);
+  background: var(--fill);
+  padding: 4px 8px;
+  border-radius: 6px;
+  word-break: break-all;
+}
+
+.path-text {
+  max-width: 420px;
+  display: inline-block;
+}
+
+.note-hint {
+  font-size: 11.5px;
+  color: var(--muted);
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+
+p.ok-text {
+  font-size: 11.5px;
+  color: #27854a;
+  margin: 8px 0 0;
+}
+
+p.error-text {
+  font-size: 11.5px;
+  color: var(--danger);
+  margin: 8px 0 0;
+}
+
+.settings-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 12px 0 14px;
+  border-top: 1px solid var(--card-line);
+  position: sticky;
+  bottom: 0;
+  background: transparent;
+}
+
+.dirty-hint {
+  color: #a55b00;
+  font-size: 11.5px;
+}
+
+/* 即时保存失败时用错误色，避免看起来像“有未保存修改” */
+.dirty-hint.is-error {
+  color: var(--danger);
+}
+

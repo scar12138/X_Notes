@@ -1,0 +1,152 @@
+:root {
+  /* 主窗口底色：实色浅灰，不透明 */
+  --bg: #f2f2f7;
+  --text: #23262f;
+  --muted: #8a90a2;
+  /* 危险色：删除、清空、彻底删除这一类操作统一用它，
+     文字 / 边框 / 图标都用同一个红，悬停加深到 --danger-hover */
+  --danger: #d92d20;
+  --danger-hover: #b42318;
+  /* 交互主色：选中态、开关、强调描边统一取这一支深灰 */
+  --ink: #262b36;
+  --ink-soft: #4c5161;
+  --ink-faint: #a0a5b4;
+  --hint: #5b6070;
+
+  /* 卡片：参考 iOS 设置页——浅灰底上放纯白卡片，靠边线和淡阴影分层 */
+  --card: #ffffff;
+  --card-line: #e5e5ea;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  /* 选中态：淡蓝边 + 淡蓝底，不用黑框 */
+  --accent: #007aff;
+  --accent-bg: #eaf4ff;
+  /* 未选中的控件底色：浅灰半透明，比卡片再透一点 */
+  --fill: rgba(118, 118, 128, 0.08);
+  --fill-hover: rgba(118, 118, 128, 0.14);
+
+  /* 便签里的液态玻璃：拖动条 saturate(180%)、时间条 saturate(160%)，两档有意保留差异 */
+  --glass-blur: blur(16px) saturate(180%);
+  --glass-blur-soft: blur(16px) saturate(160%);
+  font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  color: var(--text);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* 主窗口是实色浅灰底，玻璃只做在里面的元素上，不依赖透出桌面 */
+body {
+  background: var(--bg);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---------------- 按钮：全软件共用的高度 / 圆角 / 阴影 ---------------- */
+
+/* 主按钮：白色药丸 + 极淡阴影（「＋ 新建」、分类「新建」都用它） */
+.btn-primary,
+button.primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #222222;
+  font-size: 14px;
+  font-family: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+/* 悬停只加深阴影，底色不变，不跳变 */
+.btn-primary:hover:not(:disabled),
+button.primary:hover:not(:disabled) {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.btn-primary:disabled,
+button.primary:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* 次要按钮：和主按钮同一套高度 / 圆角 / 阴影，只是字号小一号，
+   避免在 320px 宽的行里把标题或分类名挤没。
+   便签行内的「定位/删除/…」更小一号，规则在 manager.css 的 .row-tools 里 */
+.mini,
+.row-actions button,
+.style-footer button,
+.modal-actions button,
+.back-button,
+.banner button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  box-sizing: border-box;
+  padding: 0 12px;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  background: #ffffff;
+  color: #222222;
+  font-size: 13px;
+  font-family: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.mini:hover:not(:disabled),
+.row-actions button:hover:not(:disabled),
+.style-footer button:hover:not(:disabled),
+.modal-actions button:hover:not(:disabled),
+.back-button:hover:not(:disabled),
+.banner button:hover:not(:disabled) {
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.mini:disabled,
+.row-actions button:disabled,
+.style-footer button:disabled,
+.banner button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  box-shadow: none;
+}
+
+/* 危险操作只换颜色，形状/高度/阴影和别的按钮完全一样；
+   文字和边框都取自同一个危险色，悬停统一加深到 --danger-hover */
+button.danger,
+button.danger-ghost,
+.row-tools .danger-ghost,
+.row-actions .danger-ghost {
+  color: var(--danger);
+  border-color: rgba(217, 45, 32, 0.45);
+}
+
+button.danger:hover:not(:disabled),
+button.danger-ghost:hover:not(:disabled),
+.row-tools .danger-ghost:hover:not(:disabled),
+.row-actions .danger-ghost:hover:not(:disabled) {
+  color: var(--danger-hover);
+  border-color: var(--danger-hover);
+}

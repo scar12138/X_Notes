@@ -1,0 +1,718 @@
+/* ---------------- 管理窗口 ---------------- */
+
+/* 主窗口是实色浅灰底；玻璃只做在里面的元素上 */
+.manager {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* 标签栏：和下面便签卡片同一个白，用一条 1px 浅灰线分开，不靠色块区分 */
+.mgr-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--card);
+  border-bottom: 1px solid var(--card-line);
+  position: relative;
+  z-index: 10;
+  flex: none;
+}
+
+.mgr-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+
+.brand-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 5px;
+  background: linear-gradient(135deg, #ffd84a, #eeb100);
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  position: relative;
+  background: var(--fill);
+  border: 1px solid var(--fill-hover);
+  padding: 2px;
+  border-radius: 999px;
+}
+
+.tabs button {
+  position: relative;
+  z-index: 1;
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--hint);
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.tabs button.active {
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  font-weight: 600;
+}
+
+/* 选中态的小药丸：纯白 + 阴影；位置和宽度由 TabPill 按当前标签量出来 */
+.tab-pill {
+  position: absolute;
+  top: 2px;
+  bottom: 2px;
+  left: 0;
+  border-radius: 999px;
+  background: var(--card);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+  pointer-events: none;
+}
+
+.tab-pill.ready {
+  transition: transform 0.24s cubic-bezier(0.32, 0.72, 0, 1), width 0.24s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.banner {
+  margin: 10px 12px 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 240, 205, 0.62);
+  border: 1px solid rgba(231, 201, 122, 0.7);
+  color: #7a5a00;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.banner button {
+  border: 1px solid rgba(231, 201, 122, 0.8);
+  background: var(--card);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+  font-family: inherit;
+  color: #6d5000;
+}
+
+/* 第二行：搜索框 + 「＋ 新建」 */
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px 0;
+  flex: none;
+}
+
+/* 搜索框：比卡片再透一点的浅灰底，聚焦时变白 */
+.search-input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--card-line);
+  border-radius: 10px;
+  background: var(--fill);
+  padding: 0 10px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.search-input:focus {
+  background: var(--card);
+  border-color: var(--card-line);
+  box-shadow: var(--card-shadow);
+}
+
+.search-input::placeholder {
+  color: var(--ink-faint);
+}
+
+/* 「＋ 新建」下拉：文字便签 / 图片便签 */
+.new-wrap {
+  position: relative;
+  flex: none;
+}
+
+/* 高度 / 内边距 / 圆角 / 阴影全部来自 base.css 的 .btn-primary，这里不再覆盖 */
+.new-button {
+  flex: none;
+  white-space: nowrap;
+}
+
+.new-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 148px;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 60;
+}
+
+.new-menu button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.new-menu button:hover {
+  background: var(--fill);
+}
+
+.notes-view,
+.trash-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 第三行：类型筛选 + 分类筛选，右侧小按钮收着快捷操作 */
+.filter-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 0;
+  flex: none;
+}
+
+/* 一整排筛选药丸：类型和分类平铺，横向滚动，分类多了也不换行、不把列表往下顶 */
+.filter-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.filter-chips::-webkit-scrollbar {
+  height: 0;
+  display: none;
+}
+
+/* 右侧「⋯」小按钮：全部显示 / 全部隐藏 / 批量管理都收在这里 */
+.more-wrap {
+  position: relative;
+  flex: none;
+}
+
+.more-button {
+  width: 28px;
+  height: 26px;
+  padding: 0 !important;
+  border-radius: 999px;
+  border: 1px solid var(--card-line);
+  background: var(--fill);
+  color: var(--ink-soft);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.more-button:hover {
+  background: var(--fill-hover);
+}
+
+/* 批量管理模式开启时：纯白 + 阴影，和选中药丸同一套 */
+.more-button.on {
+  background: var(--card);
+  border-color: var(--card-line);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.more-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 128px;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 60;
+}
+
+.more-menu button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.more-menu button:hover {
+  background: var(--fill);
+}
+
+.more-menu button.on {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* 筛选药丸：未选中浅灰半透明，选中纯白 + 阴影 */
+.cat-chip {
+  border: 1px solid var(--card-line);
+  background: var(--fill);
+  border-radius: 999px;
+  padding: 3px 11px;
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.cat-chip:hover {
+  background: var(--fill-hover);
+}
+
+.cat-chip.on {
+  background: var(--card);
+  border-color: var(--card-line);
+  color: var(--ink);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+button {
+  font-family: inherit;
+}
+
+/* 按钮的高度 / 圆角 / 阴影 / 字号统一在 base.css 的 .btn-primary 与次要按钮组里，
+   这里不再重复定义，避免两处规则打架 */
+
+.note-list {
+  flex: 1;
+  min-height: 0;
+  padding: 10px 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+}
+
+/* 便签卡片：纯白卡片浮在浅灰底上，1px 浅灰边 + 淡阴影，卡片之间留 12px 空隙 */
+.note-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  height: 64px;
+  box-sizing: border-box;
+  flex: none;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: 12px;
+  padding: 8px 12px;
+  box-shadow: var(--card-shadow);
+  transition: box-shadow 0.15s, border-color 0.15s, background 0.15s;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.note-row:hover {
+  border-color: var(--card-line);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.note-row.batch {
+  padding-left: 12px;
+  cursor: default;
+}
+
+/* 选中那张：淡蓝边 + 淡蓝底，不用黑框 */
+.note-row.checked {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.18);
+}
+
+/* 批量模式的复选框和右侧按钮同高，不比按钮大 */
+.row-check {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--ink);
+  flex: none;
+  cursor: pointer;
+}
+
+.row-cat {
+  flex: none;
+  font-size: 10px;
+  font-weight: 400;
+  color: #55607a;
+  background: var(--card);
+  border-radius: 999px;
+  padding: 1px 6px;
+  max-width: 84px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.thumb {
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  overflow: hidden;
+  background: var(--card);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  font-size: 10px;
+  color: #8a90a2;
+}
+
+.thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.note-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.note-title {
+  font-size: 14px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.note-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.lock-mark {
+  font-size: 11px;
+  flex: none;
+}
+
+.row-flag {
+  flex: none;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--ink-faint);
+  background: var(--card);
+  border-radius: 20px;
+  padding: 1px 6px;
+}
+
+.row-time {
+  margin-top: 3px;
+  font-size: 11px;
+  color: var(--ink-faint);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  position: relative;
+}
+
+/* 行内按钮：比全软件通用的 32px 小一号，避免把标题挤没；
+   高度 28px、左右内边距 8px、圆角药丸、12px 常规字重。
+   只作用于行内直接子按钮，「…」弹出的菜单项不受影响 */
+.row-tools > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 28px;
+  box-sizing: border-box;
+  padding: 0 8px;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 400;
+  font-family: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  flex: none;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.row-tools > button:hover:not(:disabled) {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.09);
+}
+
+/* 删除：白底 + 统一危险色文字 */
+.row-tools .danger-ghost {
+  color: var(--danger);
+}
+
+/* 「…」是 28×28 的圆形小按钮，三个点居中，不再拉成药丸 */
+.row-more {
+  width: 28px;
+  min-width: 28px;
+  padding: 0 !important;
+  border-radius: 999px;
+  opacity: 0;
+  transition: opacity 0.12s;
+  letter-spacing: 0;
+  line-height: 1;
+}
+
+.note-row:hover .row-more,
+.row-more.open {
+  opacity: 1;
+}
+
+.row-menu {
+  position: fixed;
+  min-width: 132px;
+  background: var(--card);
+  border: 1px solid var(--card-line);
+  border-radius: 10px;
+  box-shadow: 0 12px 30px rgba(20, 24, 40, 0.16);
+  padding: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  z-index: 50;
+}
+
+.row-menu button {
+  text-align: left;
+  border: none;
+  background: transparent;
+  padding: 7px 10px;
+  border-radius: 7px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  display: block;
+  width: 100%;
+  line-height: 1.4;
+}
+
+.row-menu button:hover {
+  background: var(--fill);
+}
+
+.row-menu button.on {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* 批量操作栏 */
+.batch-bar {
+  flex: none;
+  border-top: 1px solid var(--card-line);
+  background: var(--card);
+  box-shadow: 0 -2px 10px rgba(20, 24, 40, 0.04);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.batch-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.batch-line.wrap {
+  flex-wrap: wrap;
+}
+
+.batch-count {
+  flex: 1;
+  text-align: center;
+  font-size: 11.5px;
+  color: var(--muted);
+}
+
+.batch-cat-select {
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  padding: 0 10px;
+  font-size: 12px;
+  font-family: inherit;
+  background: var(--card);
+  color: var(--text);
+  max-width: 120px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+/* 回收站 */
+.trash-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 12px 0;
+  flex: none;
+  font-size: 12.5px;
+  color: var(--ink-soft);
+}
+
+/* 分类管理 */
+.cat-create {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 4px 0 10px;
+}
+
+.cat-create input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  background: var(--card);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.cat-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 210px;
+  overflow-y: auto;
+}
+
+.cat-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 1px;
+  border-bottom: 1px dashed rgba(150, 160, 185, 0.3);
+}
+
+.cat-item:last-child {
+  border-bottom: none;
+}
+
+.cat-item input {
+  flex: 1;
+  min-width: 0;
+  height: 32px;
+  box-sizing: border-box;
+  border: 1px solid var(--card-line);
+  border-radius: 999px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--text);
+  outline: none;
+  background: var(--card);
+}
+
+/* 分类行里的按钮和其他按钮同高同圆角，只是内边距窄一点以省出分类名的宽度 */
+.cat-item .mini,
+.cat-item button {
+  flex: none;
+  padding: 0 10px;
+}
+
+.cat-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cat-note {
+  font-size: 10.5px;
+  color: var(--muted);
+  flex: none;
+}
+
+.empty {
+  margin: 60px auto;
+  text-align: center;
+  color: var(--muted);
+}
+
+.empty-icon {
+  font-size: 34px;
+  margin-bottom: 8px;
+}
+

@@ -1,0 +1,9 @@
+﻿/* 样式按功能拆分，按原来的层叠顺序汇总：
+   base（变量与全局） → note（便签窗口） → manager（管理窗口） → settings（设置页）
+   → style-panel（样式面板） → overlay（弹窗与滚动条） */
+@import "./styles/base.css";
+@import "./styles/note.css";
+@import "./styles/manager.css";
+@import "./styles/settings.css";
+@import "./styles/style-panel.css";
+@import "./styles/overlay.css";

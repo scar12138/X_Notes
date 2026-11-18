@@ -1,0 +1,27 @@
+# ---------------- 依赖与构建产物 ----------------
+node_modules/
+dist/
+src-tauri/target/
+# Tauri 自动生成的 schema / 移动端工程缓存
+src-tauri/gen/
+
+# ---------------- 发布产物（用 GitHub Releases 分发，不入库）----------------
+release/*.zip
+release/*.exe
+release/*.dll
+release/*-portable/
+release/XN_*/
+
+# ---------------- 编辑器与系统 ----------------
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.suo
+*.user
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# ---------------- 日志与临时文件 ----------------
+*.log
+*.tmp

@@ -1,0 +1,325 @@
+/* ---------------- 便签窗口 ---------------- */
+
+html.note-page,
+html.note-page body {
+  background: transparent !important;
+  overflow: hidden;
+}
+
+html.note-page #root {
+  width: 100vw;
+  height: 100vh;
+}
+
+/* 便签本体在窗口里居中：窗口尺寸因取整比内容大 1-2px 时，多出来的部分四边均分，
+   不会全堆到右下角（原来会出现“右下角多一截”） */
+.note-root {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-root > .image-frame,
+.note-root > .note-card {
+  flex: none;
+}
+
+.note-root.empty-root {
+  background: transparent;
+}
+
+/* 原生滚动条不占位、不可见：改用便签内的悬浮细滑块 */
+.note-text {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: auto;
+  user-select: text;
+}
+
+.note-text::-webkit-scrollbar,
+.note-textarea::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+.note-textarea {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  width: 100%;
+  height: 100%;
+  padding: 12px;
+  border: none;
+  outline: none;
+  resize: none;
+  background: transparent;
+  line-height: 1.55;
+  overflow: auto;
+  user-select: text;
+}
+
+.note-card {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  transition: box-shadow 0.12s ease-out;
+}
+
+.note-text .placeholder {
+  color: rgba(0, 0, 0, 0.28);
+  user-select: none;
+}
+
+.image-frame {
+  position: relative;
+  box-sizing: content-box;
+  line-height: 0;
+  background-clip: padding-box;
+}
+
+/* 阴影盒子：尺寸严格等于图片，圆角与图片一致，overflow 隐藏裁掉图片四角 */
+.image-clip {
+  position: relative;
+  box-sizing: border-box;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.image-clip img,
+.image-clip .image-missing {
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+/* contain：整张图完整显示，不裁切、不拉伸；多出来的那点比例差居中留白 */
+.image-clip img {
+  display: block;
+  object-fit: contain;
+}
+
+.image-frame img {
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.frame-gallery::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.18),
+    inset 0 0 14px rgba(0, 0, 0, 0.22);
+  pointer-events: none;
+}
+
+.frame-polaroid::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+}
+
+.image-missing {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eceff5;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* iPhone 式小横条：80×20 透明热区，视觉上只有中间 64×5 的液态玻璃条 */
+.drag-pill-hit {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 80px;
+  height: 20px;
+  margin-left: -40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  cursor: grab;
+  user-select: none;
+  transition: opacity 200ms ease-out;
+}
+
+.drag-pill-hit.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.drag-pill-hit:active {
+  cursor: grabbing;
+}
+
+.drag-pill {
+  width: 64px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.45);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -1px 1px rgba(255, 255, 255, 0.25),
+    0 1px 2px rgba(31, 35, 45, 0.18);
+  pointer-events: none;
+}
+
+/* 双击定位光标用的透明镜像，与 .note-text 同版式 */
+.caret-mirror {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  color: transparent;
+  background: transparent;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* 拖动过程中内容区暂时不可点、不可选、不出光标 */
+.note-root.dragging .note-card,
+.note-root.dragging .note-text,
+.note-root.dragging .note-textarea,
+.note-root.dragging .image-frame img {
+  pointer-events: none;
+  user-select: none;
+  cursor: grabbing;
+}
+
+/* 悬浮滚动条：4px 细条，无轨道背景，只在滚动/悬停时淡入 */
+.scroll-track {
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  right: 3px;
+  width: 4px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.scroll-thumb {
+  position: absolute;
+  left: 0;
+  width: 4px;
+  border-radius: 999px;
+  background: rgba(38, 42, 52, 0.28);
+  opacity: 0;
+  transition: opacity 180ms ease-out;
+}
+
+.scroll-thumb.shown {
+  opacity: 1;
+}
+
+/* 创建时间：便签内部右下角的液态玻璃药丸，默认隐形，悬停淡入 */
+.note-time {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  z-index: 5;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: var(--glass-blur-soft);
+  -webkit-backdrop-filter: var(--glass-blur-soft);
+  box-shadow: 0 2px 6px rgba(31, 35, 45, 0.12);
+  color: rgba(36, 40, 50, 0.78);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 160ms ease-out;
+}
+
+.note-time.visible {
+  opacity: 1;
+}
+
+.resize-handle {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  cursor: nwse-resize;
+  z-index: 4;
+  opacity: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0 45%,
+    rgba(0, 0, 0, 0.25) 45% 55%,
+    transparent 55% 70%,
+    rgba(0, 0, 0, 0.25) 70% 80%,
+    transparent 80%
+  );
+  border-radius: 3px;
+}
+
+.note-root:hover .resize-handle {
+  opacity: 1;
+}
+
+.note-error {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  transform: translateX(-50%);
+  background: rgba(217, 45, 32, 0.95);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  max-width: 90%;
+  cursor: pointer;
+  z-index: 9;
+}
+
+.note-root.flash::after {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border: 3px solid #ffc400;
+  border-radius: 14px;
+  pointer-events: none;
+  animation: flashPulse 2s ease-in-out 1;
+}
+
+@keyframes flashPulse {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
